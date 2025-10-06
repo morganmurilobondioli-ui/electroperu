@@ -17,7 +17,7 @@
     <main class="container my-3">
       <h3>Mantenimiento de productos</h3>
 
-      <form action="">
+      <form action="" method="post" id="from-producto">
 
       <div class="card">
         <div class="card-header">
@@ -61,21 +61,29 @@
         </div>
       </div> 
       </form>
+
+      <style>
+        .table tbody tr td:nth-child(1){ text-align: center;}
+        .table tbody tr td:nth-child(3){ text-align: center;}
+        .table tbody tr td:nth-child(4){ text-align: right;}
+        .table tbody tr td:nth-child(5){ text-align: center;}
+      </style>
+
       <div class="table resposive mt-3">
-        <table class="table table-bordered" id="table-productos">
+        <table class="table table-bordered" name="tabla" id="tabla-productos">
           <colgroup>
-            <col style="width: 10%;">
+            <col style="width: 8%;">
             <col style="width: 40%;">
-            <col style="width: 15%;">
-            <col style="width: 15%;">
-            <col style="width: 20%;">
+            <col style="width: 13%;">
+            <col style="width: 13%;">
+            <col style="width: 26%;">
           </colgroup>
           <thead>
             <tr>
-              <th>ID</th>
+              <th class="text-center">ID</th>
               <th>Descripción</th>
               <th>Precio</th>
-              <th>Acciones</th>
+              <th class="text-center">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -89,7 +97,61 @@
   <footer></footer>
 
   <script>
-    
+    const API_URL = 'http://localhost:3000/api/productos'
+
+    const form = document.getElementById('form-producto')
+    const tabla = document.querySelector('#tabla-productos tbody')
+
+    //Obetener los datos (backend) > renderizar en la tabl|a
+    async function obetenerProductos(){
+     const response = await fetch(API_URL, { method: 'get' })  
+     const productos = await response.json()
+     //console.log(productos)
+
+     //Reiniciamos el contenido de la tabla
+     tabla.innerHTML='';
+     
+     productos.forEach(producto => {
+     //Crear una nueva fila y celdas con los datos contenidos en JSON
+      const row = tabla.insertRow()
+
+      row.insertCell().textContent = producto.id
+      row.insertCell().textContent = producto.descripcion
+      row.insertCell().textContent = producto.garantia
+      row.insertCell().textContent = producto.precio 
+
+      //La última cewlda contendrá 2 botones (funcionalidad)
+      const actionCell = row.insertCell()
+
+      //Botón 1: Editar
+      const editButton = document.createElement('button')
+      editButton.textContent = 'Editar'
+      editButton.classList.add('btn')
+      editButton.classList.add('btn-info')
+      editButton.classList.add('btn-sm')
+      editButton.onclick = () => cargarParaEdicion(producto)
+
+      //Botón 2: Eliminar
+      const deleteButton = document.createElement('button')
+      deleteButton.textContent = 'Eliminar'
+      deleteButton.classList.add('btn')
+      deleteButton.classList.add('btn-danger')
+      deleteButton.classList.add('btn-sm')
+      deleteButton.onclick = () => eliminarEdicion(producto.id, producto.descripcion)
+
+
+      //Agregando ambos botones a la ultima celda
+      actionCell.appendChild(editButton)
+      actionCell.appendChild(deleteButton)
+
+     });
+
+    }
+
+    //Cuando la pagina este lista, se ejecutará obtenerProductos
+    document.addEventListener('DOMContentLoaded', obetenerProductos)
+
+
   </script>
 </body>
 </html>
