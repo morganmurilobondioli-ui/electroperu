@@ -19,10 +19,12 @@
 
       <form action="" method="post" id="form-producto">
 
+        <input type="hidden" id="idproducto">
+
       <div class="card">
         <div class="card-header">
           <strong>Complete los datos</strong>
-        </div>
+        
       </div>
       <div class="card-body">
         <div class="row">
@@ -50,14 +52,15 @@
           </div>
           <div class="col-md-6">
             <div class="form-floating">
-              <input type="text" name="precio" id="precio" pattern="[0-9]+" class="form-control rounded-0 text-end" title="Solo se permiten números" required autofocus>
+              <input type="text" name="precio" id="precio" pattern="[0-9.]+" class="form-control rounded-0 text-end" title="Solo se permiten números" required autofocus>
               <label for="precio">Precio</label>
             </div>
           </div>
           <div class="card-footer text-end">
-            <button type="reset" class="btn rounded-0 btn-outline-secondary">Cancelar</button>
-            <button type="submit" class="btn rounded-0 btn-outline-secondary">Guardar</button>
+            <button type="reset"  id="btnCancelar" class="btn rounded-0 btn-outline-secondary">Cancelar</button>
+            <button type="submit" id="btnGuardar" class="btn rounded-0 btn-outline-secondary">Guardar</button>
           </div>
+        </div>
         </div>
       </div> 
       </form>
@@ -101,10 +104,19 @@
 
     const formulario = document.getElementById('form-producto')
     const tabla = document.querySelector('#tabla-productos tbody')
+
+    const idproducto = document.getElementById('idproducto')
     const descripcion = document.getElementById('descripcion')
     const garantia = document.getElementById('garantia')
     const precio = document.getElementById('precio')
 
+    const btnGuardar = document.getElementById('btnGuardar')
+    const btnCancelar = document.getElementById('btnCancelar')
+
+    //Retorna el boton guardar a su estado original
+    btnCancelar.addEventListener('click', () => {
+      btnGuardar.innerText = 'Guardar'
+    })
 
     //Obetener los datos (backend) > renderizar en la tabl|a
     async function obtenerProductos(){
@@ -174,11 +186,25 @@
       }
     }
 
+    function cargarParaEdicion(producto){
+      idproducto.value = producto.id
+      descripcion.value = producto.descripcion
+      garantia.value = producto.garantia
+      precio.value = producto.precio
+
+      btnGuardar.innerText = 'Actualizar'
+
+
+    }
+
+    //al pulsar el boton guardar (sumbit) - DEBEMOS VERIFICAR SI: registrar Actualizar
     formulario.addEventListener("submit", async (event) => {
       event.preventDefault()
       
       //Para guardar, necesitamos alamacenar datos en formato json
       //preparamos un objeto de JS con la misma estructura
+     
+
       const data = {
         descripcion: descripcion.value,
         garantia: parseInt(garantia.value),
@@ -187,13 +213,30 @@
       
       //Enviar los datos (1. URL, 2. Verbo, 3. Tipo dato, 4. JSON)
       try{
-        const response = await fetch(API_URL, { 
+
+        //¿Actualizamos o registramos?
+        let response = null
+        if(idproducto.value == ''){
+          response = await fetch(API_URL, { 
           method: 'post',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
          })
+        }else{
+          //Actualizar..
+          response = await fetch(API_URL + `/${idproducto.value}`, { 
+          method: 'put',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+         })
+        }
+
+        
          const result = await response.json()
          console.log(result)
+         btnGuardar.innerText = 'Guardar'
+         formulario.reset()
+         obtenerProductos()
       }catch(e){
         console.error(e)
       }
