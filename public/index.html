@@ -17,7 +17,7 @@
     <main class="container my-3">
       <h3>Mantenimiento de productos</h3>
 
-      <form action="" method="post" id="from-producto">
+      <form action="" method="post" id="form-producto">
 
       <div class="card">
         <div class="card-header">
@@ -65,7 +65,7 @@
       <style>
         .table tbody tr td:nth-child(1){ text-align: center;}
         .table tbody tr td:nth-child(3){ text-align: center;}
-        .table tbody tr td:nth-child(4){ text-align: right;}
+        .table tbody tr td:nth-child(4){ text-align: center;}
         .table tbody tr td:nth-child(5){ text-align: center;}
       </style>
 
@@ -82,8 +82,8 @@
             <tr>
               <th class="text-center">ID</th>
               <th>Descripción</th>
-              <th>Precio</th>
-              <th class="text-center">Acciones</th>
+              <th class="text-center">Garantía</th>
+              <th class="text-center">Precio</th>
             </tr>
           </thead>
           <tbody>
@@ -99,8 +99,12 @@
   <script>
     const API_URL = 'http://localhost:3000/api/productos'
 
-    const form = document.getElementById('form-producto')
+    const formulario = document.getElementById('form-producto')
     const tabla = document.querySelector('#tabla-productos tbody')
+    const descripcion = document.getElementById('descripcion')
+    const garantia = document.getElementById('garantia')
+    const precio = document.getElementById('precio')
+
 
     //Obetener los datos (backend) > renderizar en la tabl|a
     async function obetenerProductos(){
@@ -148,6 +152,30 @@
 
     }
 
+    formulario.addEventListener("submit", async (event) => {
+      event.preventDefault()
+      
+      //Para guardar, necesitamos alamacenar datos en formato json
+      //preparamos un objeto de JS con la misma estructura
+      const data = {
+        descripcion: descripcion.value,
+        garantia: parseInt(garantia.value),
+        precio: parseFloat(precio.value) 
+      }  
+      
+      //Enviar los datos (1. URL, 2. Verbo, 3. Tipo dato, 4. JSON)
+      try{
+        const response = await fetch(API_URL, { 
+          method: 'post',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+         })
+         const result = await response.json()
+         console.log(result)
+      }catch(e){
+        console.error(e)
+      }
+    })
     //Cuando la pagina este lista, se ejecutará obtenerProductos
     document.addEventListener('DOMContentLoaded', obetenerProductos)
 
