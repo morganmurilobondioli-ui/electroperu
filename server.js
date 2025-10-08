@@ -6,6 +6,9 @@ const path = require('path') //Express servir el frontend
 
 const productoRoutes = require('./routes/productoRoutes'); 
 const clientesRoutes = require('./routes/clientesRoutes');
+const tiendasRoutes = require('./routes/tiendasRoutes');
+
+
 
 const app = express();
 const PORT = process.env.PORT || 3000; // puerto de la app
@@ -32,6 +35,7 @@ app.use(express.json());
 // Rutas
 app.use('/api/productos', productoRoutes); 
 app.use('/api/clientes', clientesRoutes); 
+app.use('/api/tiendas', tiendasRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {

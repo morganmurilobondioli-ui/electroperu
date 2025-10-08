@@ -29,19 +29,17 @@ exports.crearCliente = async (req, res) => {
 
 // Obtener todos los clientes
 exports.obtenerClientes = async (req, res) => {
-  const sql = `
-    SELECT c.id, c.apellidos, c.nombres, c.dni, c.telefono, c.direccion,
-           t.tienda AS nombre_tienda
-    FROM clientes c
-    LEFT JOIN tiendas t ON c.tienda_id = t.id
-  `;
-
   try {
-    const [clientes] = await db.query(sql);
-    res.status(200).json(clientes);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ mensaje: 'Error interno del servidor' });
+    const [rows] = await db.query(`
+      SELECT c.*, t.tienda AS nombre_tienda
+      FROM clientes c
+      LEFT JOIN tiendas t ON c.tienda_id = t.id
+      ORDER BY c.apellidos
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error al obtener clientes' });
   }
 };
 
